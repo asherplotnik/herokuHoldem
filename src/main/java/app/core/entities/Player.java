@@ -44,32 +44,26 @@ public class Player {
 	private LocalDateTime lastConnected;
 	@ManyToOne(cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
 	private Game currentGame;
-	
+	private String ipAddress;
 		
 	public boolean isAllowReveal() {
 		return isAllowReveal;
 	}
-
 	public void setAllowReveal(boolean isAllowReveal) {
 		this.isAllowReveal = isAllowReveal;
 	}
-
 	public boolean isWinner() {
 		return winner;
 	}
-
 	public void setWinner(boolean isWinner) {
 		this.winner = isWinner;
 	}
-
 	public String getCompareString() {
 		return compareString;
 	}
-
 	public void setCompareString(String compareString) {
 		this.compareString = compareString;
 	}
-
 	public Integer getId() {
 		return id;
 	}
@@ -130,13 +124,17 @@ public class Player {
 	public void setLastAmount(int lastAmount) {
 		this.lastAmount = lastAmount;
 	}
-	
 	public LocalDateTime getLastConnected() {
 		return lastConnected;
 	}
-
 	public void setLastConnected(LocalDateTime lastConnected) {
 		this.lastConnected = lastConnected;
+	}
+	public String getIpAddress() {
+		return ipAddress;
+	}
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
 	}
 
 	@Override
