@@ -33,7 +33,7 @@ public class AddressFilter implements Filter {
         String url = req.getRequestURI();
         System.out.println(req.getRemoteAddr());
         try {
-            if(url.contains("/api")) {
+            if(restrictedPath(url)) {
                 jwtUtil.isTokenExpired(token);
                 String ipAddress = jwtUtil.extractIpAddress(token);
                 int id = jwtUtil.extractId(token);
@@ -53,6 +53,18 @@ public class AddressFilter implements Filter {
             sendErrorResponse(res,"you are not authorized");
         }
 //        chain.doFilter(request, response);
+    }
+
+    private boolean restrictedPath(String url) {
+        if (url.contains("/api")){
+            if(url.contains("/login") || url.contains("/signup")){
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
     }
 
     private void sendErrorResponse(HttpServletResponse res , String message) throws IOException {
