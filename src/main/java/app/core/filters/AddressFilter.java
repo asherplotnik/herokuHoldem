@@ -13,16 +13,12 @@ import java.io.IOException;
 public class AddressFilter implements Filter {
 
     private JwtUtil jwtUtil;
+    private AddressService addressService;
 
-    @Autowired
-    AddressService addressService;
-
-    public AddressFilter() {
-    }
-
-    public AddressFilter(JwtUtil jwtUtil) {
+    public AddressFilter(JwtUtil jwtUtil, AddressService addressService) {
         super();
         this.jwtUtil = jwtUtil;
+        this.addressService = addressService;
     }
 
     @Override

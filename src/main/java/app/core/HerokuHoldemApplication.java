@@ -2,6 +2,7 @@ package app.core;
 
 import app.core.filters.AddressFilter;
 import app.core.security.JwtUtil;
+import app.core.services.AddressService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -21,9 +22,9 @@ public class HerokuHoldemApplication {
 	}
 
 	@Bean
-	public FilterRegistrationBean<AddressFilter> tokenFilterRegistration(JwtUtil jwtUtil){
+	public FilterRegistrationBean<AddressFilter> tokenFilterRegistration(JwtUtil jwtUtil, AddressService addressService){
 		FilterRegistrationBean<AddressFilter> filterRegistrationBean = new FilterRegistrationBean<AddressFilter>();
-		AddressFilter addressFilter = new AddressFilter(jwtUtil);
+		AddressFilter addressFilter = new AddressFilter(jwtUtil,addressService);
 		filterRegistrationBean.setFilter(addressFilter);
 		filterRegistrationBean.addUrlPatterns("/*");
 		return filterRegistrationBean;
