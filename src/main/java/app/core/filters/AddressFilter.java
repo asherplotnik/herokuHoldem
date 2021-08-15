@@ -31,9 +31,10 @@ public class AddressFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
         String token = req.getHeader("token");
         String url = req.getRequestURI();
+        String method = req.getMethod();
         System.out.println(req.getRemoteAddr());
         try {
-            if(restrictedPath(url)) {
+            if(restrictedPath(url) && !method.equals("OPTIONS")) {
                 jwtUtil.isTokenExpired(token);
                 String ipAddress = jwtUtil.extractIpAddress(token);
                 int id = jwtUtil.extractId(token);
@@ -50,6 +51,7 @@ public class AddressFilter implements Filter {
                 chain.doFilter(request, response);
             }
         } catch (Exception e){
+            e.printStackTrace();
             sendErrorResponse(res,"you are not authorized");
         }
 //        chain.doFilter(request, response);
@@ -68,6 +70,7 @@ public class AddressFilter implements Filter {
     }
 
     private void sendErrorResponse(HttpServletResponse res , String message) throws IOException {
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers","*");
         res.setHeader("Access-Control-Expose-Headers","*");
