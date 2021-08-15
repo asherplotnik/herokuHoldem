@@ -1,5 +1,6 @@
 package app.core.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,5 @@ public interface PlayerRepository extends JpaRepository<Player, Integer>{
 	Optional<Player> findByEmail(String email);
 	
 	Player getById(int id);
-	Optional<Player> findByIpAddress(String ipAddress);
+	List<Player> findByIpAddress(String ipAddress);
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,12 +19,14 @@ public class AddressService {
 
     public boolean approveIpAddress(String ipAddress, int id) throws HoldemException {
         try{
-            Optional<Player> player = playerRepository.findByIpAddress(ipAddress);
-            if (player.isPresent() && id != player.get().getId()){
-                return false;
-            } else {
-                return true;
+            List<Player> players = playerRepository.findByIpAddress(ipAddress);
+            for (Player player: players){
+                if (id != player.getId()){
+                    System.out.println("found ip"+player.getId());
+                    return false;
+                }
             }
+            return true;
         } catch (Exception e) {
             throw new HoldemException(e.getLocalizedMessage());
         }

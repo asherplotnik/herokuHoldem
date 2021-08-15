@@ -20,6 +20,8 @@ public class PlayerService {
 	PlayerRepository playerRepository;
 	@Autowired
 	JwtUtil jwtUtil;
+	@Autowired
+	AddressService addressService;
 	
 	public PlayerPayload login(String email, String Password, String ipAddress) throws HoldemException{
 		try {
@@ -30,10 +32,13 @@ public class PlayerService {
 			String currGame = null;
 			if (opt.get().getCurrentGame()!=null) {
 				currGame = opt.get().getCurrentGame().getName();
-				
 			}
+			if(!addressService.approveIpAddress(ipAddress,opt.get().getId())) {
+				throw new HoldemException("Duplicate ip address");
+			}
+
+			opt.get().setIpAddress(ipAddress);
 			String token = jwtUtil.generateToken(opt.get().getEmail(), opt.get().getName(),opt.get().getId(),ipAddress);
-			
 			return new PlayerPayload(opt.get().getId(), opt.get().getName(),opt.get().getEmail(),opt.get().getPassword(),token, currGame, opt.get().getWallet());
 		} catch(Exception e) {
 			throw new HoldemException(e.getLocalizedMessage());
@@ -46,11 +51,15 @@ public class PlayerService {
 			if (opt.isPresent()){
 				throw new HoldemException("- Player email already Exists");
 			}
+			if(!addressService.approveIpAddress(ipAddress,0)) {
+				throw new HoldemException("Duplicate ip address");
+			}
 			Player dbPlayer = new Player();
 			dbPlayer.setName(player.name);
 			dbPlayer.setEmail(player.email);
 			dbPlayer.setPassword(player.password);
 			dbPlayer.setWallet(1000);
+			dbPlayer.setIpAddress(ipAddress);
 			dbPlayer  = playerRepository.save(dbPlayer);
 			player.id = dbPlayer.getId();
 			player.token = jwtUtil.generateToken(player.email, player.name,player.id, ipAddress);

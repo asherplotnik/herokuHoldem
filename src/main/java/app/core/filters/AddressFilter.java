@@ -30,7 +30,7 @@ public class AddressFilter implements Filter {
         String method = req.getMethod();
         System.out.println(req.getRemoteAddr());
         try {
-            if(restrictedPath(url) && !method.equals("OPTIONS")) {
+            if(restrictedIp(url) && !method.equals("OPTIONS")) {
                 jwtUtil.isTokenExpired(token);
                 String ipAddress = jwtUtil.extractIpAddress(token);
                 int id = jwtUtil.extractId(token);
@@ -53,7 +53,7 @@ public class AddressFilter implements Filter {
 //        chain.doFilter(request, response);
     }
 
-    private boolean restrictedPath(String url) {
+    private boolean restrictedIp(String url) {
         if (url.contains("/api")){
             if(url.contains("/login") || url.contains("/signup")){
                 return false;
