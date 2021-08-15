@@ -32,25 +32,27 @@ public class AddressFilter implements Filter {
         String token = req.getHeader("token");
         String url = req.getRequestURI();
         System.out.println(req.getRemoteAddr());
-//        try{
-//            jwtUtil.isTokenExpired(token);
-//            String ipAddress = jwtUtil.extractIpAddress(token);
-//            int id = jwtUtil.extractId(token);
-//            if(url.contains("/api")) {
-//                if(ipAddress.equals(req.getRemoteAddr())){
-//                    if(addressService.approveIpAddress(req.getRemoteAddr(),id)) {
-//                        chain.doFilter(request, response);
-//                    } else {
-//                       sendErrorResponse(res,"Duplicate ip address !!!");
-//                    }
-//                } else {
-//                    sendErrorResponse(res,"different ip address issue");
-//                }
-//            }
-//        } catch (Exception e){
-//            sendErrorResponse(res,"you are not authorized");
-//        }
-        chain.doFilter(request, response);
+        try{
+            jwtUtil.isTokenExpired(token);
+            String ipAddress = jwtUtil.extractIpAddress(token);
+            int id = jwtUtil.extractId(token);
+            if(url.contains("/api")) {
+                if(ipAddress.equals(req.getRemoteAddr())){
+                    if(addressService.approveIpAddress(req.getRemoteAddr(),id)) {
+                        chain.doFilter(request, response);
+                    } else {
+                       sendErrorResponse(res,"Duplicate ip address !!!");
+                    }
+                } else {
+                    sendErrorResponse(res,"different ip address issue");
+                }
+            } else {
+                chain.doFilter(request, response);
+            }
+        } catch (Exception e){
+            sendErrorResponse(res,"you are not authorized");
+        }
+//        chain.doFilter(request, response);
     }
 
     private void sendErrorResponse(HttpServletResponse res , String message) throws IOException {
