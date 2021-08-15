@@ -13,6 +13,8 @@ import org.springframework.web.server.ResponseStatusException;
 import app.core.services.PlayerService;
 import app.core.util.PlayerPayload;
 
+import javax.servlet.http.HttpServletRequest;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/api/player")
@@ -21,10 +23,10 @@ public class playerController {
 	PlayerService playerService;
 	
 	@GetMapping("/login")
-	public PlayerPayload login(@RequestHeader String password, @RequestHeader String email) {
+	public PlayerPayload login(@RequestHeader String password, @RequestHeader String email, HttpServletRequest req) {
 		System.out.println(password+email);
 		try {
-			return playerService.login(email, password);
+			return playerService.login(email, password, req.getRemoteAddr());
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"LOGIN FAILED - "+ e.getLocalizedMessage());
 		}
@@ -32,10 +34,10 @@ public class playerController {
 	}
 	
 	@PostMapping("/signup")
-	public PlayerPayload signup(@RequestBody PlayerPayload payload) {
+	public PlayerPayload signup(@RequestBody PlayerPayload payload, HttpServletRequest req) {
 		System.out.println(payload);
 		try {
-			return playerService.createPlayer(payload);
+			return playerService.createPlayer(payload, req.getRemoteAddr());
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"SIGNUP FAILED - "+ e.getLocalizedMessage());
 		}

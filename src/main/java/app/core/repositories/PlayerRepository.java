@@ -13,5 +13,5 @@ public interface PlayerRepository extends JpaRepository<Player, Integer>{
 	Optional<Player> findByEmail(String email);
 	
 	Player getById(int id);
-
+	Optional<Player> findByIpAddress(String ipAddress);
 }

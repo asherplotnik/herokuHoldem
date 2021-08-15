@@ -54,6 +54,10 @@ public class JwtUtil {
 		final Claims claims = extractAllClaims(token);
 		return (int) claims.get("UserId");
 	}
+	public String extractIpAddress(String token) {
+		final Claims claims = extractAllClaims(token);
+		return (String)claims.get("IpAddress");
+	}
 	
 		
 	public <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
@@ -71,10 +75,11 @@ public class JwtUtil {
 		return extractExpiration(token).before(new Date());
 	}
 	
-	public String generateToken(String userEmail, String name , int id) {
+	public String generateToken(String userEmail, String name , int id , String ipAddress ) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("Name", name);
 		claims.put("UserId", id);
+		claims.put("IpAddress", ipAddress);
 		return createToken(claims, userEmail);
 	}
 	

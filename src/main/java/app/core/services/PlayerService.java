@@ -21,7 +21,7 @@ public class PlayerService {
 	@Autowired
 	JwtUtil jwtUtil;
 	
-	public PlayerPayload login(String email, String Password) throws HoldemException{
+	public PlayerPayload login(String email, String Password, String ipAddress) throws HoldemException{
 		try {
 			Optional<Player> opt = playerRepository.findByEmailAndPassword(email,Password);
 			if (opt.isEmpty()){
@@ -32,7 +32,7 @@ public class PlayerService {
 				currGame = opt.get().getCurrentGame().getName();
 				
 			}
-			String token = jwtUtil.generateToken(opt.get().getEmail(), opt.get().getName(),opt.get().getId());
+			String token = jwtUtil.generateToken(opt.get().getEmail(), opt.get().getName(),opt.get().getId(),ipAddress);
 			
 			return new PlayerPayload(opt.get().getId(), opt.get().getName(),opt.get().getEmail(),opt.get().getPassword(),token, currGame, opt.get().getWallet());
 		} catch(Exception e) {
@@ -40,7 +40,7 @@ public class PlayerService {
 		}
 	}
 	
-	public PlayerPayload createPlayer(PlayerPayload player) throws HoldemException {
+	public PlayerPayload createPlayer(PlayerPayload player, String ipAddress) throws HoldemException {
 		try {
 			Optional<Player> opt = playerRepository.findByEmail(player.email);
 			if (opt.isPresent()){
@@ -53,7 +53,7 @@ public class PlayerService {
 			dbPlayer.setWallet(1000);
 			dbPlayer  = playerRepository.save(dbPlayer);
 			player.id = dbPlayer.getId();
-			player.token = jwtUtil.generateToken(player.email, player.name,player.id);
+			player.token = jwtUtil.generateToken(player.email, player.name,player.id, ipAddress);
 			player.wallet = dbPlayer.getWallet();
 			return player;
 		} catch (Exception e) {
