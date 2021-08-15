@@ -32,11 +32,11 @@ public class AddressFilter implements Filter {
         String token = req.getHeader("token");
         String url = req.getRequestURI();
         System.out.println(req.getRemoteAddr());
-        try{
-            jwtUtil.isTokenExpired(token);
-            String ipAddress = jwtUtil.extractIpAddress(token);
-            int id = jwtUtil.extractId(token);
+        try {
             if(url.contains("/api")) {
+                jwtUtil.isTokenExpired(token);
+                String ipAddress = jwtUtil.extractIpAddress(token);
+                int id = jwtUtil.extractId(token);
                 if(ipAddress.equals(req.getRemoteAddr())){
                     if(addressService.approveIpAddress(req.getRemoteAddr(),id)) {
                         chain.doFilter(request, response);
