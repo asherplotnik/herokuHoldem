@@ -22,7 +22,9 @@ public class PlayerService {
 	JwtUtil jwtUtil;
 	@Autowired
 	AddressService addressService;
-	
+	@Autowired
+	GameService gameService;
+
 	public PlayerPayload login(String email, String Password, String ipAddress) throws HoldemException{
 		try {
 			Optional<Player> opt = playerRepository.findByEmailAndPassword(email,Password);
@@ -85,7 +87,11 @@ public class PlayerService {
 			if(player.isEmpty()) {
 				throw new HoldemException("ERROR");
 			}
-			resetPlayer(player.get());
+			try {
+				gameService.leaveGame(token, player.get().getCurrentGame().getName());
+			} catch (HoldemException e1){
+				System.out.println(e1.getLocalizedMessage());
+			}
 			return "logged out";
 		} catch (Exception e) {
 			throw new HoldemException(e.getLocalizedMessage());
