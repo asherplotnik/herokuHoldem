@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import app.core.entities.Game;
 import app.core.entities.Player;
@@ -28,6 +29,8 @@ public class GameService {
 	PlayerRepository playerRepository;
 	@Autowired
 	JwtUtil jwtUtil;
+	@Value("${inactiveMaxTime:300}")
+	int inactiveMaxTime;
 
 	public GameData createGame(String token, GameData gameData) throws HoldemException {
 		try {
@@ -259,7 +262,7 @@ public class GameService {
 			Player currentPlayer = playerRepository.getById(currentTurnId);
 			if ( currentPlayer.getLastAct()!= PlayEnum.FOLD) {
 				Duration duration = Duration.between(currentPlayer.getLastConnected(), LocalDateTime.now());
-				if (duration.getSeconds() > 30) {
+				if (duration.getSeconds() > inactiveMaxTime) {
 					play(currentPlayer, PlayEnum.FOLD, 0);
 				}
 			}

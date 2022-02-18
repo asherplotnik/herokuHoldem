@@ -17,7 +17,7 @@ import javax.persistence.OneToMany;
 import app.core.enums.CardEnum;
 import app.core.enums.PlayEnum;
 import app.core.enums.StatusEnum;
-import javassist.compiler.CompileError;
+import io.swagger.models.auth.In;
 
 @Entity
 public class Game {
@@ -374,7 +374,7 @@ public class Game {
 			List<String> hand = new ArrayList<>(List.of(player.getCard1().toString(), player.getCard2().toString(),
 					flop.get(0).toString(), flop.get(1).toString(), flop.get(2).toString(), flop.get(3).toString(),
 					flop.get(4).toString()));
-//			hand = new ArrayList<>(List.of(player.getCard1().toString(), player.getCard2().toString(),"H8","C8","S8","D2","C2"));
+			hand = new ArrayList<>(List.of("D3","S4","H2","C2","S2","D8","C8"));
 			var numbered = hand.stream()
 					.map(currentHand -> Integer.parseInt(currentHand.substring(1)))
 					.collect(toList());
@@ -400,13 +400,10 @@ public class Game {
 			System.out.println("---------------------------");
 			System.out.println(player.getName());
 			System.out.println("[" + hand.get(0) + "," + hand.get(1) + "]");
-			int sequence = 0;
-			Integer cardSequence = 0;
-			for (Map.Entry<Integer, Integer> entry : evalMap.entrySet()) {
-				sequence = entry.getValue();
-				cardSequence = entry.getKey();
-				break;
-			}
+
+			Map.Entry<Integer,Integer> entrySet = evalMap.entrySet().iterator().next();
+			Integer cardSequence = entrySet.getKey();
+			Integer sequence = entrySet.getValue();
 
 			List<String> flush;
 			int straight = 0;
@@ -611,7 +608,7 @@ public class Game {
 				} else {
 					count = 1;
 					sorted.set(0, 1);
-					Collections.sort(sorted, Collections.reverseOrder());
+					sorted.sort(Collections.reverseOrder());
 					break;
 				}
 			}
