@@ -556,6 +556,7 @@ public class Game {
 			players.get(el).setWallet(players.get(el).getWallet() + (int)(pot*0.95)/winners.size());
 			players.get(el).setAllowReveal(true);
 		}
+		System.out.println("----------WINNERS------------");
 	}
 
 	private int compareResult(String bestHand, String compareString) {
