@@ -1,14 +1,8 @@
 package app.core.entities;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 import static java.util.stream.Collectors.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -23,6 +17,7 @@ import javax.persistence.OneToMany;
 import app.core.enums.CardEnum;
 import app.core.enums.PlayEnum;
 import app.core.enums.StatusEnum;
+import javassist.compiler.CompileError;
 
 @Entity
 public class Game {
@@ -380,24 +375,26 @@ public class Game {
 					flop.get(0).toString(), flop.get(1).toString(), flop.get(2).toString(), flop.get(3).toString(),
 					flop.get(4).toString()));
 //			hand = new ArrayList<>(List.of(player.getCard1().toString(), player.getCard2().toString(),"H8","C8","S8","D2","C2"));
-			List<Integer> numbered = new ArrayList<>();
+			var numbered = hand.stream()
+					.map(currentHand -> Integer.parseInt(currentHand.substring(1)))
+					.collect(toList());
 
-			for (int i = 0; i < 7; i++) {
-				numbered.add(Integer.parseInt(hand.get(i).substring(1)));
-			}
+			var distinct = numbered.stream()
+					.distinct()
+					.sorted(Collections.reverseOrder())
+					.collect(toList());
 
-			Collections.sort(numbered, Collections.reverseOrder());
-			Set<Integer> distinct = new HashSet<>(numbered);
 			Map<Integer, Integer> evalMap = new HashMap<>();
 
 			for (Integer s : distinct) {
 				evalMap.put(s, Collections.frequency(numbered, s));
 			}
 
-			evalMap = evalMap.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByKey()))
-					.collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+			Comparator<Map.Entry<Integer, Integer>> comparingByKey = Map.Entry.comparingByKey();
+			Comparator<Map.Entry<Integer, Integer>> comparingByValue = Map.Entry.comparingByValue();
 
-			evalMap = evalMap.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+			evalMap = evalMap.entrySet().stream()
+					.sorted(Collections.reverseOrder(comparingByValue.thenComparing(comparingByKey)))
 					.collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
 
 			System.out.println("---------------------------");
