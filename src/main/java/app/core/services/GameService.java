@@ -64,7 +64,7 @@ public class GameService {
                 throw new HoldemException("- need more players");
             }
             Game game = gameRepository.findByName(name);
-            if (game == null) {
+            if (game.equals(null)) {
                 throw new HoldemException("- invalid game.");
             }
             if (game.getAdmin() != admin) {
@@ -225,7 +225,7 @@ public class GameService {
         gameData.setFlop(game.getFlop());
         gameData.setId(game.getId());
         gameData.setName(game.getName());
-        gameData.setPlayerturn(game.getPlayerTurn());
+        gameData.setPlayerTurn(game.getPlayerTurn());
         gameData.setPot(game.getPot());
         gameData.setStart(game.getStart());
         gameData.setStatus(game.getStatus());
