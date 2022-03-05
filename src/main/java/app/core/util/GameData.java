@@ -22,7 +22,7 @@ public class GameData {
 	private List<Player> players;
 	private List<Integer> ActivePlayers;
 	private List<CardEnum>  flop = new ArrayList<CardEnum>();
-	private int playerturn;
+	private int playerTurn;
 	private int dealer;
 	private PlayEnum lastPlay;
 	private int lastRaised;
@@ -120,11 +120,11 @@ public class GameData {
 	public void setFlop(List<CardEnum> flop) {
 		this.flop = flop;
 	}
-	public int getPlayerturn() {
-		return playerturn;
+	public int getPlayerTurn() {
+		return playerTurn;
 	}
-	public void setPlayerturn(int playerturn) {
-		this.playerturn = playerturn;
+	public void setPlayerTurn(int playerTurn) {
+		this.playerTurn = playerTurn;
 	}
 	
 	
