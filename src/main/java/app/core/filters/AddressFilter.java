@@ -28,7 +28,7 @@ public class AddressFilter implements Filter {
         String token = req.getHeader("token");
         String url = req.getRequestURI();
         String method = req.getMethod();
-        System.out.println(req.getRemoteAddr());
+        //System.out.println(req.getRemoteAddr());
         try {
             if(restrictedIp(url) && !method.equals("OPTIONS")) {
                 jwtUtil.isTokenExpired(token);

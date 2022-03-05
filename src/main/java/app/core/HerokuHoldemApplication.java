@@ -23,7 +23,7 @@ public class HerokuHoldemApplication {
 
 	@Bean
 	public FilterRegistrationBean<AddressFilter> tokenFilterRegistration(JwtUtil jwtUtil, AddressService addressService){
-		FilterRegistrationBean<AddressFilter> filterRegistrationBean = new FilterRegistrationBean<AddressFilter>();
+		FilterRegistrationBean<AddressFilter> filterRegistrationBean = new FilterRegistrationBean<>();
 		AddressFilter addressFilter = new AddressFilter(jwtUtil,addressService);
 		filterRegistrationBean.setFilter(addressFilter);
 		filterRegistrationBean.addUrlPatterns("/*");
