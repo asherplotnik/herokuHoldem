@@ -1,23 +1,15 @@
 package app.core.entities;
 
-import java.time.LocalDateTime;
-import java.util.*;
-
-import static java.util.stream.Collectors.*;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import app.core.enums.CardEnum;
 import app.core.enums.PlayEnum;
 import app.core.enums.StatusEnum;
-import io.swagger.models.auth.In;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @Entity
 public class Game {
@@ -43,11 +35,11 @@ public class Game {
 	private List<Integer> activePlayers = new ArrayList<>();
 	@Enumerated(EnumType.STRING)
 	@ElementCollection(targetClass = CardEnum.class)
-	private List<CardEnum>  deck = new ArrayList<CardEnum>();
+	private List<CardEnum>  deck = new ArrayList<>();
 	@Enumerated(EnumType.STRING)
 	@ElementCollection(targetClass = CardEnum.class)
 	private List<CardEnum>  flop; 
-	private int playerturn;
+	private int playerTurn;
 	private int dealer;
 	@Enumerated(EnumType.STRING)
 	private PlayEnum lastPlay;
@@ -57,11 +49,12 @@ public class Game {
 	
 	public List<Player> getPlayersPublicData(Player currentPlayer){
 		List<Player> list = new ArrayList<>();
-		Boolean notAllFold = false;
+		boolean notAllFold = false;
 		if (status == StatusEnum.SHOWDOWN) {
 			for (Player player : players) {
 				if (!player.isWinner() && player.getLastAct()!=PlayEnum.FOLD) {
 					notAllFold = true;
+					break;
 				}
 			}
 		}
@@ -169,8 +162,8 @@ public class Game {
 		return dealer;
 	}
 
-	public void setDealer(int smallBlind) {
-		this.dealer = smallBlind;
+	public void setDealer(int place) {
+		this.dealer = place;
 	}
 
 	public int getAdmin() {
@@ -253,12 +246,12 @@ public class Game {
 		this.flop = flop;
 	}
 
-	public int getPlayerturn() {
-		return playerturn;
+	public int getPlayerTurn() {
+		return playerTurn;
 	}
 
-	public void setPlayerturn(int playerturn) {
-		this.playerturn = playerturn;
+	public void setPlayerTurn(int playerTurn) {
+		this.playerTurn = playerTurn;
 	}
 
 	public void initDeck() {
@@ -271,17 +264,17 @@ public class Game {
 				CardEnum.S5, CardEnum.S6, CardEnum.S7, CardEnum.S8, CardEnum.S9, CardEnum.S10, CardEnum.S11,
 				CardEnum.S12, CardEnum.S13, CardEnum.S14));
 		Collections.shuffle(deck);
-		this.flop = new ArrayList<CardEnum>();
+		this.flop = new ArrayList<>();
 	}
 
 	public void deal() {
 		setStatus(StatusEnum.DEAL);
 		initDeck();
-		for (int i = 0; i < players.size(); i++) {
-			players.get(i).setCard1(deck.remove(0));
+		for (Player player : players) {
+			player.setCard1(deck.remove(0));
 		}
-		for (int i = 0; i < players.size(); i++) {
-			players.get(i).setCard2(deck.remove(0));
+		for (Player player : players) {
+			player.setCard2(deck.remove(0));
 		}
 	}
 
@@ -290,8 +283,8 @@ public class Game {
 		setLastRaised(getFirstPlayer());
 		setLastPlay(PlayEnum.CHECK);
 		setStatus(StatusEnum.FLOP);
-		setPlayerturn(getFirstPlayer());
-		flop = new ArrayList<CardEnum>();
+		setPlayerTurn(getFirstPlayer());
+		flop = new ArrayList<>();
 		flop.add(deck.remove(0));
 		flop.add(deck.remove(0));
 		flop.add(deck.remove(0));
@@ -303,7 +296,7 @@ public class Game {
 		setLastRaised(getFirstPlayer());
 		setLastPlay(PlayEnum.CHECK);
 		setStatus(StatusEnum.TURN);
-		setPlayerturn(getFirstPlayer());
+		setPlayerTurn(getFirstPlayer());
 		flop.add(deck.remove(0));
 	}
 
@@ -312,7 +305,7 @@ public class Game {
 		setLastRaised(getFirstPlayer());
 		setLastPlay(PlayEnum.CHECK);
 		setStatus(StatusEnum.RIVER);
-		setPlayerturn(getFirstPlayer());
+		setPlayerTurn(getFirstPlayer());
 		flop.add(deck.remove(0));
 	}
 	
@@ -374,7 +367,7 @@ public class Game {
 			List<String> hand = new ArrayList<>(List.of(player.getCard1().toString(), player.getCard2().toString(),
 					flop.get(0).toString(), flop.get(1).toString(), flop.get(2).toString(), flop.get(3).toString(),
 					flop.get(4).toString()));
-			hand = new ArrayList<>(List.of("D3","S4","H2","C2","S2","D8","C8"));
+//			hand = new ArrayList<>(List.of("D3","S4","H2","C2","S2","D8","C8"));
 			var numbered = hand.stream()
 					.map(currentHand -> Integer.parseInt(currentHand.substring(1)))
 					.collect(toList());
@@ -406,10 +399,10 @@ public class Game {
 			Integer sequence = entrySet.getValue();
 
 			List<String> flush;
-			int straight = 0;
-			int straightFlush = 0;
+			int straight;
+			int straightFlush;
 			List<Integer> redacted = new ArrayList<>(distinct);
-			Collections.sort(redacted, Collections.reverseOrder());
+			redacted.sort(Collections.reverseOrder());
 			switch (sequence) {
 			case 1:
 				if ((flush = checkFlush(hand)) != null) {
@@ -417,7 +410,7 @@ public class Game {
 						eval = "9(Straight Flush)-" + straightFlush;
 						player.setCompareString("9-"+straightFlush);
 					} else {
-						eval = "6(Flush)-" + flush.toString();
+						eval = "6(Flush)-" + flush;
 						player.setCompareString("6-"+convertFlush(flush));
 					}
 				} else {
@@ -454,7 +447,7 @@ public class Game {
 							eval = "9(Straight Flush)-" + straightFlush;
 							player.setCompareString("9-"+straightFlush);
 						} else {
-							eval = "6(Flush)-" + flush.toString();
+							eval = "6(Flush)-" + flush;
 							player.setCompareString("6-"+convertFlush(flush));
 						}
 					} else {
@@ -482,12 +475,11 @@ public class Game {
 				for (Map.Entry<Integer, Integer> entry : evalMap.entrySet()) {
 					if (entry.getValue() == 3) {
 						tripleCount++;
+						redacted.remove(entry.getKey());
 						if (tripleCount < 2) {
-							redacted.remove(entry.getKey());
 							triple = entry.getKey();
 						} else {
-							redacted.remove(entry.getKey());
-							pair = entry.getKey();;
+							pair = entry.getKey();
 						}
 					}
 					if (entry.getValue() == 2) {
@@ -508,7 +500,7 @@ public class Game {
 								eval = "9(Straight Flush)-" + straightFlush;
 								player.setCompareString("9-" + straightFlush);
 							} else {
-								eval = "6(Flush)-" + flush.toString();
+								eval = "6(Flush)-" + flush;
 								player.setCompareString("6-" + convertFlush(flush));
 							}
 						} else {
@@ -594,8 +586,8 @@ public class Game {
 		if (numbered.size() < 5) {
 			return -1;
 		}
-		List<Integer> sorted = new ArrayList<Integer>(new HashSet<>(numbered));
-		Collections.sort(sorted, Collections.reverseOrder());
+		List<Integer> sorted = new ArrayList<>(new HashSet<>(numbered));
+		sorted.sort(Collections.reverseOrder());
 		int i;
 		int count = 1;
 		int highest = sorted.get(0);
@@ -607,7 +599,6 @@ public class Game {
 						return highest;
 					}
 				} else {
-					count = 1;
 					sorted.set(0, 1);
 					sorted.sort(Collections.reverseOrder());
 					break;
@@ -632,8 +623,8 @@ public class Game {
 
 	private int checkStraightFlush(List<String> hand) {
 		List<Integer> numbered = new ArrayList<>();
-		for (int i = 0; i < hand.size(); i++) {
-			numbered.add(Integer.parseInt(hand.get(i).substring(1)));
+		for (String s : hand) {
+			numbered.add(Integer.parseInt(s.substring(1)));
 		}
 		return checkStraight(numbered);
 	}
@@ -650,22 +641,22 @@ public class Game {
 			}
 
 			if (numList.size() > 4) {
-				Collections.sort(numList, Collections.reverseOrder());
+				numList.sort(Collections.reverseOrder());
 				for (Integer num : numList) {
 					list.add(arr[i] + num);
 				}
 				return list;
 			}
-			numList = new ArrayList<Integer>();
-			list = new ArrayList<String>();
+			numList = new ArrayList<>();
+			list = new ArrayList<>();
 		}
 		return null;
 	}
 	
 	private String convertFlush(List<String> list) {
-		String str = "";
+		StringBuilder str = new StringBuilder();
 		for (String el: list) {
-			str += el.substring(1)+"-";
+			str.append(el.substring(1)).append("-");
 		}
 		return str.substring(0,str.length()-1);
 	}
