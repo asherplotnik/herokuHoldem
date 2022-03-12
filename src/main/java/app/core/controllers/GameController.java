@@ -1,6 +1,9 @@
 package app.core.controllers;
 
 import java.util.List;
+import java.util.Map;
+
+import app.core.util.OpenGame;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -71,7 +74,7 @@ public class GameController {
 	}
 	
 	@GetMapping("/getOpenGames")
-	public List<String> getOpenGames(@RequestHeader String token){
+	public List<OpenGame> getOpenGames(@RequestHeader String token){
 		try {
 			return gameService.getOpenGames();
 		} catch (Exception e) {

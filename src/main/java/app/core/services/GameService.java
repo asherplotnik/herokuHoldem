@@ -9,6 +9,7 @@ import app.core.repositories.GameRepository;
 import app.core.repositories.PlayerRepository;
 import app.core.security.JwtUtil;
 import app.core.util.GameData;
+import app.core.util.OpenGame;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,10 +18,8 @@ import org.springframework.util.CollectionUtils;
 import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -273,14 +272,11 @@ public class GameService {
         }
     }
 
-    public List<String> getOpenGames() {
-        List<Game> games = gameRepository.findByStatus(StatusEnum.WAITING);
-        //List<Game> games = gameRepository.findAll();
-        List<String> list = new ArrayList<>();
-        for (Game game : games) {
-            list.add(game.getName());
-        }
-        return list;
+    public List<OpenGame> getOpenGames() {
+        var games = gameRepository.findByStatus(StatusEnum.WAITING);
+        return games.stream()
+                .map(openGame -> new OpenGame(openGame.getName(), openGame.getAdmin()))
+                .collect(Collectors.toList());
     }
 
     public GameData play(String token, PlayEnum play, int amount) throws HoldemException {
